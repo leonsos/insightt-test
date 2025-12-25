@@ -56,3 +56,33 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
+
+# Firebase Functions - Ignore generated/compiled files
+firebase-functions/node_modules/
+firebase-functions/lib/
+firebase-functions/functions/node_modules/
+firebase-functions/functions/lib/
+firebase-functions/functions/dist/
+firebase-functions/functions/build/
+firebase-functions/functions/.firebase/
+firebase-functions/.firebase/
+firebase-functions/functions/package-lock.json
+firebase-functions/package-lock.json
+firebase-functions/functions/*.log
+firebase-functions/functions/*.log.*
+firebase-functions/functions/*.log.*.*
+firebase-functions/functions/*.log.*.*.*
+firebase-functions/functions/*.log.*.*.*.*
+firebase-functions/functions/*.log.*.*.*.*.*
+firebase-functions/*.log
+firebase-functions/*.log.*
+firebase-functions/*.log.*.*
+firebase-functions/*.log.*.*.*
+firebase-functions/*.log.*.*.*.*
+firebase-functions/*.log.*.*.*.*.*
+firebase-functions/functions/*.local
+firebase-functions/*.local
+firebase-functions/functions/firebase-debug.log
+firebase-functions/functions/firebase-debug.*.log
+firebase-functions/firebase-debug.log
+firebase-functions/firebase-debug.*.log

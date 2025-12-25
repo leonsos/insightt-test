@@ -1,0 +1,29 @@
+{
+  "name": "insightt-test-functions",
+  "description": "Firebase Cloud Functions for Task Management",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": "18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0",
+    "axios": "^1.7.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts"
+}

@@ -5,6 +5,13 @@
       "codebase": "default",
       "disallowLegacyRuntimeConfig": true,
       "runtime": "nodejs20",
+      "secretEnvironmentVariables": [
+        {
+          "key": "DATABASE_URL",
+          "secret": "DATABASE_URL",
+          "version": "latest"
+        }
+      ],
       "ignore": [
         "node_modules",
         ".git",

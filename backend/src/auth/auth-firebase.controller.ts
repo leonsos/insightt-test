@@ -2,6 +2,7 @@ import { Controller, Post, Body, UseGuards, Request, Get, HttpCode, HttpStatus }
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthFirebaseService } from './auth-firebase.service';
 import { AuthService } from './auth.service';
+import { AuthBlacklistService } from './auth-blacklist.service';
 import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -19,7 +20,8 @@ interface AuthenticatedRequest extends Request {
 export class AuthFirebaseController {
   constructor(
     private readonly authFirebaseService: AuthFirebaseService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly authBlacklistService: AuthBlacklistService
   ) {}
 
   @Post('register')
@@ -222,10 +224,19 @@ export class AuthFirebaseController {
   })
   async logout(@Request() req: AuthenticatedRequest) {
     const firebaseUid = req.user.uid;
+    const authorization = (req.headers as any)['authorization'];
+    const token = authorization ? authorization.split(' ')[1] : null;
+
+    if (!token) {
+      throw new Error('Token no encontrado en la solicitud');
+    }
 
     try {
-      // Revocar los tokens de refresh en Firebase
+      // 1. Revocar los tokens de refresh en Firebase
       await this.authFirebaseService.revokeRefreshTokens(firebaseUid);
+      
+      // 2. Agregar el ID Token actual a la blacklist
+      this.authBlacklistService.blacklistToken(token);
       
       return;
     } catch (error) {
@@ -248,10 +259,19 @@ export class AuthFirebaseController {
   })
   async deleteAccount(@Request() req: AuthenticatedRequest) {
     const firebaseUid = req.user.uid;
+    const authorization = (req.headers as any)['authorization'];
+    const token = authorization ? authorization.split(' ')[1] : null;
+
+    if (!token) {
+      throw new Error('Token no encontrado en la solicitud');
+    }
 
     try {
-      // Eliminar de Firebase Authentication
+      // 1. Eliminar de Firebase Authentication
       await this.authFirebaseService.deleteUser(firebaseUid);
+      
+      // 2. Agregar el ID Token actual a la blacklist
+      this.authBlacklistService.blacklistToken(token);
       
       return;
     } catch (error) {

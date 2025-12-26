@@ -5,10 +5,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { FirebaseService } from '../firebase.service';
+import { AuthBlacklistService } from '../auth-blacklist.service';
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
-  constructor(private firebaseService: FirebaseService) {}
+  constructor(
+    private firebaseService: FirebaseService,
+    private authBlacklistService: AuthBlacklistService
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -25,12 +29,17 @@ export class FirebaseAuthGuard implements CanActivate {
       throw new UnauthorizedException('Token is missing');
     }
 
+    // Verificar si el token está en blacklist (revocado)
+    if (this.authBlacklistService.isTokenBlacklisted(token)) {
+      throw new UnauthorizedException('Token has been revoked');
+    }
+
     try {
       // Verificar el token con Firebase
       const decodedToken = await this.firebaseService.verifyIdToken(token);
       
       // Agregar la información del usuario al request para uso posterior
-      request.user = {        
+      request.user = {
         ...decodedToken,
       };
 

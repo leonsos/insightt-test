@@ -54,7 +54,16 @@ admin.initializeApp();
  */
 export const markTaskDone = functions.runWith({ secrets: ["DATABASE_URL"] }).https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
   try {
-    // 1. Verificar método HTTP
+    // 1. Manejo de CORS Manual
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== 'POST') {
       res.status(405).json({
         success: false,

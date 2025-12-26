@@ -86,3 +86,38 @@ firebase-functions/functions/firebase-debug.log
 firebase-functions/functions/firebase-debug.*.log
 firebase-functions/firebase-debug.log
 firebase-functions/firebase-debug.*.log
+
+# Frontend build & dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+frontend/.turbo/
+frontend/.parcel-cache/
+frontend/.eslintcache
+
+# Env files
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Cypress artifacts
+frontend/cypress/videos/
+frontend/cypress/screenshots/
+frontend/cypress/downloads/
+frontend/cypress/.cache/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# OS files
+frontend/.DS_Store
+frontend/Thumbs.db
+
+# Editor settings
+frontend/.vscode/
+frontend/.idea/
+

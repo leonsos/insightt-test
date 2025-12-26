@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { FirebaseService } from '../auth/firebase.service';
+import { AuthService } from '../auth/auth.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './entities/task.entity';
@@ -9,32 +10,42 @@ import { TaskEntity } from './entities/task.entity';
 export class TasksService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly firebaseService: FirebaseService
+    private readonly firebaseService: FirebaseService,
+    private readonly authService: AuthService
   ) {}
 
-  async create(createTaskDto: CreateTaskDto, userId: number): Promise<TaskEntity> {
+  async create(createTaskDto: CreateTaskDto, firebaseUid: string, email: string): Promise<TaskEntity> {
+    // Obtener o crear el usuario en nuestra base de datos
+    const user = await this.authService.findOrCreateUser(firebaseUid, email);
+    
     const task = await this.prisma.task.create({
       data: {
         ...createTaskDto,
-        userId,
+        userId: user.id,
       },
     });
 
     return this.mapToEntity(task);
   }
 
-  async findAll(userId: number): Promise<TaskEntity[]> {
+  async findAll(firebaseUid: string, email: string): Promise<TaskEntity[]> {
+    // Obtener el usuario en nuestra base de datos
+    const user = await this.authService.findOrCreateUser(firebaseUid, email);
+    
     const tasks = await this.prisma.task.findMany({
-      where: { userId },
+      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     });
 
     return tasks.map(task => this.mapToEntity(task));
   }
 
-  async findOne(id: number, userId: number): Promise<TaskEntity> {
+  async findOne(id: number, firebaseUid: string, email: string): Promise<TaskEntity> {
+    // Obtener el usuario en nuestra base de datos
+    const user = await this.authService.findOrCreateUser(firebaseUid, email);
+    
     const task = await this.prisma.task.findFirst({
-      where: { id, userId },
+      where: { id, userId: user.id },
     });
 
     if (!task) {
@@ -44,10 +55,13 @@ export class TasksService {
     return this.mapToEntity(task);
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto, userId: number): Promise<TaskEntity> {
+  async update(id: number, updateTaskDto: UpdateTaskDto, firebaseUid: string, email: string): Promise<TaskEntity> {
+    // Obtener el usuario en nuestra base de datos
+    const user = await this.authService.findOrCreateUser(firebaseUid, email);
+    
     // Verificar que la tarea pertenece al usuario
     const existingTask = await this.prisma.task.findFirst({
-      where: { id, userId },
+      where: { id, userId: user.id },
     });
 
     if (!existingTask) {
@@ -62,10 +76,13 @@ export class TasksService {
     return this.mapToEntity(task);
   }
 
-  async remove(id: number, userId: number): Promise<void> {
+  async remove(id: number, firebaseUid: string, email: string): Promise<void> {
+    // Obtener el usuario en nuestra base de datos
+    const user = await this.authService.findOrCreateUser(firebaseUid, email);
+    
     // Verificar que la tarea pertenece al usuario
     const existingTask = await this.prisma.task.findFirst({
-      where: { id, userId },
+      where: { id, userId: user.id },
     });
 
     if (!existingTask) {
@@ -77,10 +94,13 @@ export class TasksService {
     });
   }
 
-  async markAsDone(id: number, userId: number): Promise<TaskEntity> {
+  async markAsDone(id: number, firebaseUid: string, email: string): Promise<TaskEntity> {
+    // Obtener el usuario en nuestra base de datos
+    const user = await this.authService.findOrCreateUser(firebaseUid, email);
+    
     // Verificar que la tarea pertenece al usuario
     const existingTask = await this.prisma.task.findFirst({
-      where: { id, userId },
+      where: { id, userId: user.id },
     });
 
     if (!existingTask) {

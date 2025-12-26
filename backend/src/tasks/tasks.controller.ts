@@ -9,6 +9,7 @@ import { TaskEntity } from './entities/task.entity';
 interface AuthenticatedRequest extends Request {
   user: {
     uid: string;
+    email: string;
     [key: string]: any;
   };
 }
@@ -21,7 +22,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Crear una nueva tarea' })
+  @ApiOperation({ summary: 'Crear una nueva tarea (registro automático de usuario)' })
   @ApiBody({
     type: CreateTaskDto,
     examples: {
@@ -46,7 +47,7 @@ export class TasksController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Tarea creada exitosamente',
+    description: 'Tarea creada exitosamente (usuario registrado automáticamente)',
     type: TaskEntity
   })
   @ApiResponse({
@@ -61,7 +62,7 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto,
     @Request() req: AuthenticatedRequest
   ): Promise<TaskEntity> {
-    return this.tasksService.create(createTaskDto, Number(req.user.uid));
+    return this.tasksService.create(createTaskDto, req.user.uid, req.user.email);
   }
 
   @Get()
@@ -76,7 +77,7 @@ export class TasksController {
     description: 'No autorizado - Token JWT inválido o ausente'
   })
   async findAll(@Request() req: AuthenticatedRequest): Promise<TaskEntity[]> {
-    return this.tasksService.findAll(Number(req.user.uid));
+    return this.tasksService.findAll(req.user.uid, req.user.email);
   }
 
   @Get(':id')
@@ -101,7 +102,7 @@ export class TasksController {
     description: 'Tarea no encontrada'
   })
   async findOne(@Param('id') id: string, @Request() req: AuthenticatedRequest): Promise<TaskEntity> {
-    const task = await this.tasksService.findOne(+id, Number(req.user.uid));
+    const task = await this.tasksService.findOne(+id, req.user.uid, req.user.email);
     if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
@@ -165,7 +166,7 @@ export class TasksController {
     @Body() updateTaskDto: UpdateTaskDto,
     @Request() req: AuthenticatedRequest
   ): Promise<TaskEntity> {
-    return this.tasksService.update(+id, updateTaskDto, Number(req.user.uid));
+    return this.tasksService.update(+id, updateTaskDto, req.user.uid, req.user.email);
   }
 
   @Delete(':id')
@@ -190,7 +191,7 @@ export class TasksController {
     description: 'Tarea no encontrada'
   })
   async remove(@Param('id') id: string, @Request() req: AuthenticatedRequest): Promise<void> {
-    await this.tasksService.remove(+id, Number(req.user.uid));
+    await this.tasksService.remove(+id, req.user.uid, req.user.email);
   }
 
   @Patch(':id/done')
@@ -215,6 +216,6 @@ export class TasksController {
     description: 'Tarea no encontrada'
   })
   async markAsDone(@Param('id') id: string, @Request() req: AuthenticatedRequest): Promise<TaskEntity> {
-    return this.tasksService.markAsDone(+id, Number(req.user.uid));
+    return this.tasksService.markAsDone(+id, req.user.uid, req.user.email);
   }
 }

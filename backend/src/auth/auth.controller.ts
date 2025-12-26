@@ -1,5 +1,5 @@
 import { Controller, UseGuards, Request } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
 import { FirebaseService } from './firebase.service';
 import { AuthService } from './auth.service';
@@ -18,5 +18,5 @@ export class AuthController {
   constructor(
     private readonly firebaseService: FirebaseService,
     private readonly authService: AuthService
-  ) {}
+  ) { }
 }

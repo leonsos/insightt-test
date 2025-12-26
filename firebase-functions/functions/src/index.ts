@@ -52,7 +52,7 @@ admin.initializeApp();
  *   }
  * }
  */
-export const markTaskDone = functions.https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
+export const markTaskDone = functions.runWith({ secrets: ["DATABASE_URL"] }).https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
   try {
     // 1. Verificar método HTTP
     if (req.method !== 'POST') {
@@ -113,7 +113,7 @@ export const markTaskDone = functions.https.onRequest(async (req: functions.http
 
     // 6. Verificar que el usuario sea dueño de la tarea y actualizar
     const client = await pool.connect();
-    
+
     try {
       // Iniciar transacción
       await client.query('BEGIN');
@@ -170,7 +170,7 @@ export const markTaskDone = functions.https.onRequest(async (req: functions.http
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+
     res.status(500).json({
       success: false,
       error: 'Internal server error',

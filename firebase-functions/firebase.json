@@ -4,6 +4,7 @@
       "source": ".",
       "codebase": "default",
       "disallowLegacyRuntimeConfig": true,
+      "runtime": "nodejs20",
       "ignore": [
         "node_modules",
         ".git",
@@ -15,7 +16,10 @@
       "predeploy": [
         "npm run lint",
         "npm run build"
-      ]
+      ],
+      "cleanupPolicy": {
+        "retentionDays": 30
+      }
     }
   ]
 }
